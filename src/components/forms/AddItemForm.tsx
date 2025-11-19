@@ -1,0 +1,137 @@
+'use client';
+
+import { useState } from 'react';
+
+interface AddItemFormProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (data: any) => void;
+}
+
+export default function AddItemForm({ isOpen, onClose, onSubmit }: AddItemFormProps) {
+  const [formData, setFormData] = useState({
+    itemName: '',
+    sku: '',
+    quantity: '',
+    location: '',
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(formData);
+    setFormData({
+      itemName: '',
+      sku: '',
+      quantity: '',
+      location: '',
+    });
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+        <div className="flex justify-between items-center p-6 border-b border-gray-200">
+          <h2 className="text-xl font-bold text-gray-900">Add New Item</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700 text-xl"
+          >
+            ✕
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Item Name
+            </label>
+            <input
+              type="text"
+              name="itemName"
+              value={formData.itemName}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter item name"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              SKU
+            </label>
+            <input
+              type="text"
+              name="sku"
+              value={formData.sku}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="SKU-001"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Quantity
+            </label>
+            <input
+              type="number"
+              name="quantity"
+              value={formData.quantity}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="0"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Location
+            </label>
+            <select
+              name="location"
+              value={formData.location}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Select location</option>
+              <option value="Warehouse A">Warehouse A</option>
+              <option value="Warehouse B">Warehouse B</option>
+              <option value="Warehouse C">Warehouse C</option>
+            </select>
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700"
+            >
+              Add Item
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}

@@ -4,133 +4,164 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-export default function ItemsSidebar() {
+interface MenuSection {
+  label: string;
+  icon: string;
+  mainPath: string;
+  expanded: boolean;
+  setExpanded: (value: boolean) => void;
+  items: { label: string; path: string }[];
+}
+
+function MenuSection({ label, icon, mainPath, expanded, setExpanded, items }: MenuSection) {
   const pathname = usePathname();
   const router = useRouter();
-  const [isItemsExpanded, setIsItemsExpanded] = useState(true);
+  
+  const isActive = pathname.startsWith(mainPath);
 
-  const isActive = (path: string) => pathname === path;
-
-  const handleItemsClick = () => {
-    setIsItemsExpanded(true);
-    router.push('/items');
+  const handleClick = () => {
+    setExpanded(!expanded);
+    if (pathname !== mainPath) {
+      router.push(mainPath);
+    }
   };
 
   return (
-    <div id="sidebar-items" className="w-64 bg-slate-900 text-white flex flex-col flex-shrink-0 h-fit min-h-full overflow-y-auto">
-      <div className="p-4 border-b border-slate-700">
-        <div className="flex items-center gap-2 text-xl font-bold">
-          <i className="fa-solid fa-book"></i>
-          <span>TechPro Inventory</span>
+    <div className="space-y-0">
+      <button
+        onClick={handleClick}
+        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-all duration-200 ${
+          isActive
+            ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
+            : 'text-gray-300 hover:bg-slate-800/60'
+        }`}
+      >
+        <i className={`fa-solid ${icon} w-4`}></i>
+        <span className="flex-1 text-left truncate">{label}</span>
+        <i
+          className={`fa-solid fa-chevron-down text-xs transition-transform duration-200 flex-shrink-0 ${
+            expanded ? 'rotate-180' : ''
+          }`}
+        />
+      </button>
+
+      {/* Dropdown Items - Expand Downward Inside Sidebar */}
+      {expanded && (
+        <div className="pl-2 space-y-1 mt-1 max-h-96 overflow-y-auto">
+          {items.map((item) => (
+            <Link
+              key={item.path}
+              href={item.path}
+              className={`flex items-center gap-3 px-3 py-2 rounded-md text-xs font-medium transition-all duration-150 ml-4 ${
+                pathname === item.path
+                  ? 'bg-blue-500/30 text-blue-300 border-l-2 border-blue-400'
+                  : 'text-gray-400 hover:text-gray-200 hover:bg-slate-800/40'
+              }`}
+            >
+              <i className="fa-solid fa-angle-right text-xs flex-shrink-0" />
+              <span className="truncate">{item.label}</span>
+            </Link>
+          ))}
         </div>
-      </div>
-      
-      <nav className="flex-1 p-4 space-y-2">
-        {/* Home Link */}
-        <Link
-          href="/"
-          className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-slate-800 text-gray-300 transition-colors"
+      )}
+    </div>
+  );
+}
+
+export default function ItemsSidebar() {
+  const pathname = usePathname();
+  const [isExpanded, setIsExpanded] = useState(true);
+  const [isItemsExpanded, setIsItemsExpanded] = useState(pathname.startsWith('/items'));
+
+  const itemsSections = [
+    {
+      label: 'Items',
+      icon: 'fa-box',
+      mainPath: '/items',
+      expanded: isItemsExpanded,
+      setExpanded: setIsItemsExpanded,
+      items: [
+        { label: 'All Items', path: '/items' },
+        { label: 'Composite Items', path: '/items/composite-items' },
+        { label: 'Item Groups', path: '/items/item-groups' },
+        { label: 'Price Lists', path: '/items/price-lists' },
+      ],
+    },
+  ];
+
+  return (
+    <div className={`bg-gradient-to-b from-slate-900 to-slate-950 text-white flex flex-col transition-all duration-300 ease-in-out border-r border-slate-700 ${
+      isExpanded ? 'w-64' : 'w-20'
+    } overflow-hidden`}>
+      {/* Header */}
+      <div className="p-4 border-b border-slate-700/50 flex items-center justify-between gap-2">
+        <div className={`flex items-center gap-3 ${!isExpanded && 'hidden'}`}>
+          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-sm">
+            T
+          </div>
+          <span className="font-semibold text-sm truncate">TechPro</span>
+        </div>
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="p-1.5 hover:bg-slate-800 rounded-md transition-colors flex-shrink-0"
+          title={isExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
         >
-          <i className="fa-solid fa-home"></i>
-          <span>Home</span>
-        </Link>
+          <i className={`fa-solid fa-chevron-${isExpanded ? 'left' : 'right'} text-sm`}></i>
+        </button>
+      </div>
 
-        {/* Items with submenu */}
-        <div>
-          <button
-            onClick={handleItemsClick}
-            className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-colors cursor-pointer ${
-              pathname.startsWith('/items')
-                ? 'bg-blue-600 text-white'
-                : 'hover:bg-slate-800 text-gray-300'
-            }`}
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto scrollbar-thin scrollbar-track-slate-900 scrollbar-thumb-slate-700">
+        <div className={`${isExpanded ? 'p-3' : 'p-2'} space-y-1.5`}>
+          {/* Home */}
+          <Link
+            href="/"
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-all duration-200 ${
+              pathname === '/'
+                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
+                : 'text-gray-300 hover:bg-slate-800/60'
+            } ${!isExpanded && 'justify-center'}`}
+            title={!isExpanded ? 'Home' : ''}
           >
-            <i className="fa-solid fa-box"></i>
-            <span>Items</span>
-            <i className={`fa-solid fa-chevron-down ml-auto text-xs transition-transform ${
-              isItemsExpanded ? 'rotate-180' : ''
-            }`}></i>
-          </button>
+            <i className="fa-solid fa-home w-4 flex-shrink-0" />
+            {isExpanded && <span className="truncate">Home</span>}
+          </Link>
 
-          {/* Submenu Items */}
-          {isItemsExpanded && (
-            <div className="pl-8 space-y-2 mt-2 text-sm text-gray-300">
-              <Link
-                href="/items"
-                className={`block py-2 px-3 rounded hover:bg-slate-800 transition-colors ${
-                  pathname === '/items' ? 'text-blue-400 bg-slate-800' : ''
-                }`}
-              >
-                Items
-              </Link>
-              <Link
-                href="/items/composite-items"
-                className={`block py-2 px-3 rounded hover:bg-slate-800 transition-colors ${
-                  pathname === '/items/composite-items' ? 'text-blue-400 bg-slate-800' : ''
-                }`}
-              >
-                Composite Items
-              </Link>
-              <Link
-                href="/items/item-groups"
-                className={`block py-2 px-3 rounded hover:bg-slate-800 transition-colors ${
-                  pathname === '/items/item-groups' ? 'text-blue-400 bg-slate-800' : ''
-                }`}
-              >
-                Item Groups
-              </Link>
-              <Link
-                href="/items/price-lists"
-                className={`block py-2 px-3 rounded hover:bg-slate-800 transition-colors ${
-                  pathname === '/items/price-lists' ? 'text-blue-400 bg-slate-800' : ''
-                }`}
-              >
-                Price Lists
-              </Link>
-            </div>
+          {/* Items Menu Section */}
+          {isExpanded ? (
+            <>
+              {itemsSections.map((section) => (
+                <MenuSection key={section.mainPath} {...section} />
+              ))}
+            </>
+          ) : (
+            <Link
+              href="/items"
+              className={`flex items-center justify-center px-3 py-2.5 rounded-md text-sm font-medium transition-all duration-200 ${
+                pathname.startsWith('/items')
+                  ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
+                  : 'text-gray-300 hover:bg-slate-800/60'
+              }`}
+              title="Items"
+            >
+              <i className="fa-solid fa-box" />
+            </Link>
           )}
         </div>
-
-        {/* Other menu items */}
-        <Link
-          href="/sales"
-          className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-slate-800 text-gray-300 transition-colors"
-        >
-          <i className="fa-solid fa-cart-shopping"></i>
-          <span>Sales</span>
-        </Link>
-
-        <Link
-          href="/purchases"
-          className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-slate-800 text-gray-300 transition-colors"
-        >
-          <i className="fa-solid fa-lock"></i>
-          <span>Purchases</span>
-        </Link>
-
-        <Link
-          href="/reports"
-          className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-slate-800 text-gray-300 transition-colors"
-        >
-          <i className="fa-solid fa-chart-bar"></i>
-          <span>Reports</span>
-        </Link>
-
-        <Link
-          href="/documents"
-          className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-slate-800 text-gray-300 transition-colors"
-        >
-          <i className="fa-solid fa-folder"></i>
-          <span>Documents</span>
-        </Link>
       </nav>
-      
-      <div className="p-4 border-t border-slate-700">
-        <a href="#" className="flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300">
-          <i className="fa-solid fa-sliders"></i>
-          <span>Configure Features</span>
-        </a>
-      </div>
+
+      {/* Footer */}
+      {isExpanded && (
+        <div className="p-3 border-t border-slate-700/50">
+          <a
+            href="#"
+            className="flex items-center gap-3 px-3 py-2 rounded-md text-xs text-gray-400 hover:text-gray-200 hover:bg-slate-800/40 transition-colors"
+          >
+            <i className="fa-solid fa-sliders" />
+            <span>Settings</span>
+          </a>
+        </div>
+      )}
     </div>
   );
 }

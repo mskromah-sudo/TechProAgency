@@ -1,7 +1,11 @@
 'use client';
 
+import { useState } from 'react';
+import CreateSalesOrderForm from '@/components/forms/CreateSalesOrderForm';
+
 export default function SalesOrdersPage() {
-  const salesOrdersData = [
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [salesOrdersData, setSalesOrdersData] = useState([
     {
       id: 1,
       orderNumber: 'SO-2024-001',
@@ -38,7 +42,7 @@ export default function SalesOrdersPage() {
       createdDate: '2024-11-16',
       shippingDate: 'TBD',
     },
-  ];
+  ]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -55,11 +59,27 @@ export default function SalesOrdersPage() {
     }
   };
 
+  const handleAddOrder = (data: any) => {
+    const newOrder = {
+      id: salesOrdersData.length + 1,
+      orderNumber: data.soNumber,
+      customerName: data.customerName,
+      amount: '$0.00',
+      status: 'Draft',
+      createdDate: new Date().toISOString().split('T')[0],
+      shippingDate: data.dueDate,
+    };
+    setSalesOrdersData([...salesOrdersData, newOrder]);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-900">Sales Orders</h1>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+        <button
+          onClick={() => setIsFormOpen(true)}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+        >
           <i className="fa-solid fa-plus"></i>
           <span>Create Order</span>
         </button>
@@ -119,6 +139,12 @@ export default function SalesOrdersPage() {
           </tbody>
         </table>
       </div>
+
+      <CreateSalesOrderForm
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        onSubmit={handleAddOrder}
+      />
     </div>
   );
 }

@@ -1,31 +1,50 @@
 'use client';
 
-export default function PurchasesPage() {
-  const purchasesMetrics = [
-    { label: 'Total Purchases', value: '$85,200.00', change: '+5.8%', icon: 'fa-shopping-cart' },
-    { label: 'Pending Bills', value: '$32,100.00', change: '+2.1%', icon: 'fa-hourglass' },
-    { label: 'Purchase Orders', value: '156', change: '+10.2%', icon: 'fa-clipboard-list' },
-    { label: 'Payment Terms Avg', value: '30 Days', change: '+1.5%', icon: 'fa-calendar' },
-  ];
+import SalesActivityCard from '@/components/cards/SalesActivityCard';
+import InventorySummaryCard from '@/components/cards/InventorySummaryCard';
 
+const purchasesActivityData = [
+  { value: 156, label: 'Orders', status: 'PURCHASE ORDERS', color: 'blue' as const },
+  { value: 32, label: 'Bills', status: 'PENDING BILLS', color: 'amber' as const },
+  { value: 18, label: 'Bills', status: 'OVERDUE BILLS', color: 'red' as const },
+  { value: 42, label: 'Returns', status: 'PENDING RETURNS', color: 'teal' as const },
+];
+
+const purchasesMetrics = [
+  { label: 'Total Purchases', value: '$85,200.00', change: '+5.8%', icon: 'fa-shopping-cart' },
+  { label: 'Pending Bills', value: '$32,100.00', change: '+2.1%', icon: 'fa-hourglass' },
+  { label: 'Purchase Orders', value: '156', change: '+10.2%', icon: 'fa-clipboard-list' },
+  { label: 'Payment Terms Avg', value: '30 Days', change: '+1.5%', icon: 'fa-calendar' },
+];
+
+export default function PurchasesPage() {
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Purchases Overview</h1>
-        <div className="flex gap-2">
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
-            <i className="fa-solid fa-plus"></i>
-            <span>New Bill</span>
-          </button>
-          <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
-            <i className="fa-solid fa-plus"></i>
-            <span>New Order</span>
-          </button>
+    <div className="p-8">
+      {/* Welcome Section */}
+      <div id="section-welcome" className="mb-8">
+        <div className="flex items-center gap-3 mb-4">
+          <i className="fa-solid fa-shopping-bag text-2xl text-gray-400"></i>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Hello, Demo User</h1>
+            <p className="text-gray-600">Purchases Management</p>
+          </div>
+        </div>
+        
+        <div className="flex gap-8 border-b border-gray-200 mb-6">
+          <button className="pb-4 text-blue-600 border-b-2 border-blue-600 font-medium">Dashboard</button>
+          <button className="pb-4 text-gray-600 hover:text-gray-900">Getting Started</button>
+          <button className="pb-4 text-gray-600 hover:text-gray-900">Recent Updates</button>
         </div>
       </div>
 
+      {/* Purchases Activity Section */}
+      <div id="section-purchases-activity" className="grid grid-cols-2 gap-8 mb-8">
+        <SalesActivityCard items={purchasesActivityData} />
+        <InventorySummaryCard quantityInHand="$85,200" quantityToBeReceived="$32,100" />
+      </div>
+
       {/* Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {purchasesMetrics.map((metric, index) => (
           <div key={index} className="bg-white rounded-lg shadow-md p-6 border-t-4 border-green-600">
             <div className="flex items-center justify-between">

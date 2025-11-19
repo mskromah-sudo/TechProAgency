@@ -1,7 +1,11 @@
 'use client';
 
+import { useState } from 'react';
+import AddCustomerForm from '@/components/forms/AddCustomerForm';
+
 export default function CustomersPage() {
-  const customersData = [
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [customersData, setCustomersData] = useState([
     {
       id: 1,
       customerName: 'Acme Corporation',
@@ -38,7 +42,7 @@ export default function CustomersPage() {
       outstandingBalance: '$5,800',
       status: 'Inactive',
     },
-  ];
+  ]);
 
   const getStatusColor = (status: string) => {
     return status === 'Active'
@@ -46,11 +50,23 @@ export default function CustomersPage() {
       : 'bg-gray-100 text-gray-800';
   };
 
+  const handleAddCustomer = (data: any) => {
+    const newCustomer = {
+      id: customersData.length + 1,
+      ...data,
+      outstandingBalance: '$0',
+    };
+    setCustomersData([...customersData, newCustomer]);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-900">Customers</h1>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+        <button
+          onClick={() => setIsFormOpen(true)}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+        >
           <i className="fa-solid fa-plus"></i>
           <span>Add Customer</span>
         </button>
@@ -108,6 +124,12 @@ export default function CustomersPage() {
           </tbody>
         </table>
       </div>
+
+      <AddCustomerForm
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        onSubmit={handleAddCustomer}
+      />
     </div>
   );
 }

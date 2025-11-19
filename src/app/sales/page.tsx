@@ -1,31 +1,51 @@
 'use client';
 
-export default function SalesPage() {
-  const salesMetrics = [
-    { label: 'Total Revenue', value: '$125,450.00', change: '+12.5%', icon: 'fa-chart-line' },
-    { label: 'Invoices Created', value: '248', change: '+8.2%', icon: 'fa-file-lines' },
-    { label: 'Pending Invoices', value: '$32,100.00', change: '+3.1%', icon: 'fa-hourglass' },
-    { label: 'Collections Rate', value: '94.5%', change: '+2.3%', icon: 'fa-percent' },
-  ];
+import SalesActivityCard from '@/components/cards/SalesActivityCard';
+import InventorySummaryCard from '@/components/cards/InventorySummaryCard';
+import EmptyCard from '@/components/cards/EmptyCard';
 
+const salesActivityData = [
+  { value: 51, label: 'Qty', status: 'TO BE PACKED', color: 'blue' as const },
+  { value: 40, label: 'Pkgs', status: 'TO BE SHIPPED', color: 'red' as const },
+  { value: 52, label: 'Pkgs', status: 'TO BE DELIVERED', color: 'teal' as const },
+  { value: 97, label: 'Qty', status: 'TO BE INVOICED', color: 'amber' as const },
+];
+
+const salesMetrics = [
+  { label: 'Total Revenue', value: '$125,450.00', change: '+12.5%', icon: 'fa-chart-line' },
+  { label: 'Invoices Created', value: '248', change: '+8.2%', icon: 'fa-file-lines' },
+  { label: 'Pending Invoices', value: '$32,100.00', change: '+3.1%', icon: 'fa-hourglass' },
+  { label: 'Collections Rate', value: '94.5%', change: '+2.3%', icon: 'fa-percent' },
+];
+
+export default function SalesPage() {
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Sales Overview</h1>
-        <div className="flex gap-2">
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
-            <i className="fa-solid fa-plus"></i>
-            <span>New Invoice</span>
-          </button>
-          <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
-            <i className="fa-solid fa-plus"></i>
-            <span>New Order</span>
-          </button>
+    <div className="p-8">
+      {/* Welcome Section */}
+      <div id="section-welcome" className="mb-8">
+        <div className="flex items-center gap-3 mb-4">
+          <i className="fa-solid fa-cart-shopping text-2xl text-gray-400"></i>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Hello, Demo User</h1>
+            <p className="text-gray-600">Sales Management</p>
+          </div>
+        </div>
+        
+        <div className="flex gap-8 border-b border-gray-200 mb-6">
+          <button className="pb-4 text-blue-600 border-b-2 border-blue-600 font-medium">Dashboard</button>
+          <button className="pb-4 text-gray-600 hover:text-gray-900">Getting Started</button>
+          <button className="pb-4 text-gray-600 hover:text-gray-900">Recent Updates</button>
         </div>
       </div>
 
+      {/* Sales Activity Section */}
+      <div id="section-sales-activity" className="grid grid-cols-2 gap-8 mb-8">
+        <SalesActivityCard items={salesActivityData} />
+        <InventorySummaryCard quantityInHand="127..." quantityToBeReceived="62" />
+      </div>
+
       {/* Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {salesMetrics.map((metric, index) => (
           <div key={index} className="bg-white rounded-lg shadow-md p-6 border-t-4 border-blue-600">
             <div className="flex items-center justify-between">

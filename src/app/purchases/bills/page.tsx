@@ -1,7 +1,11 @@
 'use client';
 
+import { useState } from 'react';
+import CreateBillForm from '@/components/forms/CreateBillForm';
+
 export default function BillsPage() {
-  const billsData = [
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [billsData, setBillsData] = useState([
     {
       id: 1,
       billNumber: 'BILL-2024-001',
@@ -38,7 +42,7 @@ export default function BillsPage() {
       status: 'Partially Paid',
       paidDate: '2024-11-10',
     },
-  ];
+  ]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -55,11 +59,27 @@ export default function BillsPage() {
     }
   };
 
+  const handleAddBill = (data: any) => {
+    const newBill = {
+      id: billsData.length + 1,
+      billNumber: data.billNumber,
+      vendorName: data.vendorName,
+      amount: data.amount,
+      dueDate: data.dueDate,
+      status: 'Unpaid',
+      paidDate: '-',
+    };
+    setBillsData([...billsData, newBill]);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-900">Bills</h1>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+        <button
+          onClick={() => setIsFormOpen(true)}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+        >
           <i className="fa-solid fa-plus"></i>
           <span>Create Bill</span>
         </button>
@@ -119,6 +139,12 @@ export default function BillsPage() {
           </tbody>
         </table>
       </div>
+
+      <CreateBillForm
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        onSubmit={handleAddBill}
+      />
     </div>
   );
 }

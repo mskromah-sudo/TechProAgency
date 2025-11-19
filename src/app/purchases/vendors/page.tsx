@@ -1,7 +1,11 @@
 'use client';
 
+import { useState } from 'react';
+import AddVendorForm from '@/components/forms/AddVendorForm';
+
 export default function VendorsPage() {
-  const vendorsData = [
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [vendorsData, setVendorsData] = useState([
     {
       id: 1,
       vendorName: 'TechSupply Inc',
@@ -38,7 +42,7 @@ export default function VendorsPage() {
       outstandingAmount: '$2,800',
       status: 'Inactive',
     },
-  ];
+  ]);
 
   const getStatusColor = (status: string) => {
     return status === 'Active'
@@ -46,11 +50,23 @@ export default function VendorsPage() {
       : 'bg-gray-100 text-gray-800';
   };
 
+  const handleAddVendor = (data: any) => {
+    const newVendor = {
+      id: vendorsData.length + 1,
+      ...data,
+      outstandingAmount: '$0',
+    };
+    setVendorsData([...vendorsData, newVendor]);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-900">Vendors</h1>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+        <button
+          onClick={() => setIsFormOpen(true)}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+        >
           <i className="fa-solid fa-plus"></i>
           <span>Add Vendor</span>
         </button>
@@ -108,6 +124,12 @@ export default function VendorsPage() {
           </tbody>
         </table>
       </div>
+
+      <AddVendorForm
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        onSubmit={handleAddVendor}
+      />
     </div>
   );
 }

@@ -1,7 +1,11 @@
 'use client';
 
+import { useState } from 'react';
+import CreatePurchaseOrderForm from '@/components/forms/CreatePurchaseOrderForm';
+
 export default function PurchaseOrdersPage() {
-  const purchaseOrdersData = [
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [purchaseOrdersData, setPurchaseOrdersData] = useState([
     {
       id: 1,
       poNumber: 'PO-2024-001',
@@ -38,7 +42,7 @@ export default function PurchaseOrdersPage() {
       createdDate: '2024-11-16',
       deliveryDate: 'TBD',
     },
-  ];
+  ]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -55,11 +59,27 @@ export default function PurchaseOrdersPage() {
     }
   };
 
+  const handleAddOrder = (data: any) => {
+    const newOrder = {
+      id: purchaseOrdersData.length + 1,
+      poNumber: data.poNumber,
+      vendorName: data.vendorName,
+      amount: '$0.00',
+      status: 'Draft',
+      createdDate: new Date().toISOString().split('T')[0],
+      deliveryDate: data.expectedDelivery,
+    };
+    setPurchaseOrdersData([...purchaseOrdersData, newOrder]);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-900">Purchase Orders</h1>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+        <button
+          onClick={() => setIsFormOpen(true)}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+        >
           <i className="fa-solid fa-plus"></i>
           <span>Create Order</span>
         </button>
@@ -119,6 +139,12 @@ export default function PurchaseOrdersPage() {
           </tbody>
         </table>
       </div>
+
+      <CreatePurchaseOrderForm
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        onSubmit={handleAddOrder}
+      />
     </div>
   );
 }

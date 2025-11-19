@@ -1,7 +1,11 @@
 'use client';
 
+import { useState } from 'react';
+import CreateInvoiceForm from '@/components/forms/CreateInvoiceForm';
+
 export default function InvoicesPage() {
-  const invoicesData = [
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [invoicesData, setInvoicesData] = useState([
     {
       id: 1,
       invoiceNumber: 'INV-2024-001',
@@ -38,7 +42,7 @@ export default function InvoicesPage() {
       status: 'Partially Paid',
       paidDate: '2024-11-10',
     },
-  ];
+  ]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -55,11 +59,24 @@ export default function InvoicesPage() {
     }
   };
 
+  const handleAddInvoice = (data: any) => {
+    const newInvoice = {
+      id: invoicesData.length + 1,
+      ...data,
+      status: 'Unpaid',
+      paidDate: '-',
+    };
+    setInvoicesData([...invoicesData, newInvoice]);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-900">Invoices</h1>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+        <button
+          onClick={() => setIsFormOpen(true)}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+        >
           <i className="fa-solid fa-plus"></i>
           <span>Create Invoice</span>
         </button>
@@ -119,6 +136,12 @@ export default function InvoicesPage() {
           </tbody>
         </table>
       </div>
+
+      <CreateInvoiceForm
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        onSubmit={handleAddInvoice}
+      />
     </div>
   );
 }

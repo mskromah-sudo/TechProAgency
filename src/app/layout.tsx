@@ -31,15 +31,15 @@ export default function RootLayout({
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <div className="flex min-h-screen bg-gray-50">
-          <Sidebar />
-          <div id="main-content" className="flex-1 flex flex-col">
-            <Header />
-            <div className="flex-1 overflow-y-auto">
+        <div className="flex flex-col min-h-screen bg-gray-50">
+          <Header />
+          <div className="flex flex-1 overflow-hidden">
+            <Sidebar />
+            <div id="main-content" className="flex-1 overflow-y-auto">
               {children}
             </div>
+            <RightSidebar />
           </div>
-          <RightSidebar />
         </div>
       </body>
     </html>
