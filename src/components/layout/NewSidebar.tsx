@@ -6,7 +6,7 @@ import Link from 'next/link';
 const menuItems = [
   {
     name: 'Home',
-    icon: 'fa-solid fa-house',
+    icon: 'fa-solid fa-home',
     path: '/',
   },
   {
