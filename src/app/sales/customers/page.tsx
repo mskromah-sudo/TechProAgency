@@ -43,6 +43,8 @@ export default function CustomersPage() {
       status: 'Inactive',
     },
   ]);
+  const [editingCustomer, setEditingCustomer] = useState(null);
+  const [isDeleteConfirmation, setIsDeleteConfirmation] = useState('');
 
   const getStatusColor = (status: string) => {
     return status === 'Active'
@@ -51,12 +53,38 @@ export default function CustomersPage() {
   };
 
   const handleAddCustomer = (data: any) => {
-    const newCustomer = {
-      id: customersData.length + 1,
-      ...data,
-      outstandingBalance: '$0',
-    };
-    setCustomersData([...customersData, newCustomer]);
+    if (editingCustomer) {
+      // @ts-ignore
+      const updatedCustomers = customersData.map((customer) =>
+      // @ts-ignore
+        customer.id === editingCustomer.id ? { ...customer, ...data } : customer
+      );
+      setCustomersData(updatedCustomers);
+    } else {
+      const newCustomer = {
+        id: customersData.length + 1,
+        ...data,
+        outstandingBalance: '$0',
+      };
+      setCustomersData([...customersData, newCustomer]);
+    }
+    setEditingCustomer(null);
+  };
+
+  const handleEditCustomer = (customer: any) => {
+    setEditingCustomer(customer);
+    setIsFormOpen(true);
+  };
+
+  const handleDeleteCustomer = (customerId: number) => {
+    const updatedCustomers = customersData.filter(
+      (customer) => customer.id !== customerId
+    );
+    setCustomersData(updatedCustomers);
+    setIsDeleteConfirmation('Customer successfully deleted.');
+    setTimeout(() => {
+      setIsDeleteConfirmation('');
+    }, 3000);
   };
 
   return (
@@ -64,7 +92,10 @@ export default function CustomersPage() {
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-900">Customers</h1>
         <button
-          onClick={() => setIsFormOpen(true)}
+          onClick={() => {
+            setEditingCustomer(null);
+            setIsFormOpen(true);
+          }}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
         >
           <i className="fa-solid fa-plus"></i>
@@ -84,6 +115,13 @@ export default function CustomersPage() {
           <option>Inactive</option>
         </select>
       </div>
+
+      {isDeleteConfirmation && (
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+          <strong className="font-bold">Success!</strong>
+          <span className="block sm:inline"> {isDeleteConfirmation}</span>
+        </div>
+      )}
 
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <table className="w-full">
@@ -112,10 +150,16 @@ export default function CustomersPage() {
                   </span>
                 </td>
                 <td className="px-6 py-4 text-sm">
-                  <button className="text-blue-600 hover:text-blue-800 mr-3">
+                  <button
+                    onClick={() => handleEditCustomer(customer)}
+                    className="text-blue-600 hover:text-blue-800 mr-3"
+                  >
                     <i className="fa-solid fa-pen-to-square"></i>
                   </button>
-                  <button className="text-red-600 hover:text-red-800">
+                  <button
+                    onClick={() => handleDeleteCustomer(customer.id)}
+                    className="text-red-600 hover:text-red-800"
+                  >
                     <i className="fa-solid fa-trash"></i>
                   </button>
                 </td>
@@ -127,8 +171,13 @@ export default function CustomersPage() {
 
       <AddCustomerForm
         isOpen={isFormOpen}
-        onClose={() => setIsFormOpen(false)}
+        onClose={() => {
+          setIsFormOpen(false);
+          setEditingCustomer(null);
+        }}
         onSubmit={handleAddCustomer}
+        // @ts-ignore
+        customerData={editingCustomer}
       />
     </div>
   );

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Sidebar from "@/components/layout/Sidebar";
+import NewSidebar from "@/components/layout/NewSidebar";
 import Header from "@/components/layout/Header";
 import RightSidebar from "@/components/layout/RightSidebar";
 
@@ -34,10 +34,14 @@ export default function RootLayout({
         <div className="flex flex-col min-h-screen bg-gray-50">
           <Header />
           <div className="flex flex-1 overflow-hidden">
-            <Sidebar />
-            <div id="main-content" className="flex-1 overflow-y-auto">
+            <NewSidebar />
+            <main
+              id="main-content"
+              className="flex-1 overflow-y-auto p-8"
+              style={{ marginLeft: '240px' }} // Adjust margin to accommodate the new sidebar
+            >
               {children}
-            </div>
+            </main>
             <RightSidebar />
           </div>
         </div>

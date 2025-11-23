@@ -43,6 +43,8 @@ export default function VendorsPage() {
       status: 'Inactive',
     },
   ]);
+  const [editingVendor, setEditingVendor] = useState(null);
+  const [isDeleteConfirmation, setIsDeleteConfirmation] = useState('');
 
   const getStatusColor = (status: string) => {
     return status === 'Active'
@@ -51,12 +53,38 @@ export default function VendorsPage() {
   };
 
   const handleAddVendor = (data: any) => {
-    const newVendor = {
-      id: vendorsData.length + 1,
-      ...data,
-      outstandingAmount: '$0',
-    };
-    setVendorsData([...vendorsData, newVendor]);
+    if (editingVendor) {
+      // @ts-ignore
+      const updatedVendors = vendorsData.map((vendor) =>
+      // @ts-ignore
+        vendor.id === editingVendor.id ? { ...vendor, ...data } : vendor
+      );
+      setVendorsData(updatedVendors);
+    } else {
+      const newVendor = {
+        id: vendorsData.length + 1,
+        ...data,
+        outstandingAmount: '$0',
+      };
+      setVendorsData([...vendorsData, newVendor]);
+    }
+    setEditingVendor(null);
+  };
+
+  const handleEditVendor = (vendor: any) => {
+    setEditingVendor(vendor);
+    setIsFormOpen(true);
+  };
+
+  const handleDeleteVendor = (vendorId: number) => {
+    const updatedVendors = vendorsData.filter(
+      (vendor) => vendor.id !== vendorId
+    );
+    setVendorsData(updatedVendors);
+    setIsDeleteConfirmation('Vendor successfully deleted.');
+    setTimeout(() => {
+      setIsDeleteConfirmation('');
+    }, 3000);
   };
 
   return (
@@ -64,7 +92,10 @@ export default function VendorsPage() {
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-900">Vendors</h1>
         <button
-          onClick={() => setIsFormOpen(true)}
+          onClick={() => {
+            setEditingVendor(null);
+            setIsFormOpen(true);
+          }}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
         >
           <i className="fa-solid fa-plus"></i>
@@ -84,6 +115,13 @@ export default function VendorsPage() {
           <option>Inactive</option>
         </select>
       </div>
+
+      {isDeleteConfirmation && (
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+          <strong className="font-bold">Success!</strong>
+          <span className="block sm:inline"> {isDeleteConfirmation}</span>
+        </div>
+      )}
 
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <table className="w-full">
@@ -112,10 +150,16 @@ export default function VendorsPage() {
                   </span>
                 </td>
                 <td className="px-6 py-4 text-sm">
-                  <button className="text-blue-600 hover:text-blue-800 mr-3">
+                  <button
+                    onClick={() => handleEditVendor(vendor)}
+                    className="text-blue-600 hover:text-blue-800 mr-3"
+                  >
                     <i className="fa-solid fa-pen-to-square"></i>
                   </button>
-                  <button className="text-red-600 hover:text-red-800">
+                  <button
+                    onClick={() => handleDeleteVendor(vendor.id)}
+                    className="text-red-600 hover:text-red-800"
+                  >
                     <i className="fa-solid fa-trash"></i>
                   </button>
                 </td>
@@ -127,8 +171,13 @@ export default function VendorsPage() {
 
       <AddVendorForm
         isOpen={isFormOpen}
-        onClose={() => setIsFormOpen(false)}
+        onClose={() => {
+          setIsFormOpen(false);
+          setEditingVendor(null);
+        }}
         onSubmit={handleAddVendor}
+        // @ts-ignore
+        vendorData={editingVendor}
       />
     </div>
   );

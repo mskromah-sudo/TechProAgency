@@ -43,6 +43,8 @@ export default function SalesOrdersPage() {
       shippingDate: 'TBD',
     },
   ]);
+  const [editingOrder, setEditingOrder] = useState(null);
+  const [isDeleteConfirmation, setIsDeleteConfirmation] = useState('');
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -60,16 +62,42 @@ export default function SalesOrdersPage() {
   };
 
   const handleAddOrder = (data: any) => {
-    const newOrder = {
-      id: salesOrdersData.length + 1,
-      orderNumber: data.soNumber,
-      customerName: data.customerName,
-      amount: '$0.00',
-      status: 'Draft',
-      createdDate: new Date().toISOString().split('T')[0],
-      shippingDate: data.dueDate,
-    };
-    setSalesOrdersData([...salesOrdersData, newOrder]);
+    if (editingOrder) {
+      // @ts-ignore
+      const updatedOrders = salesOrdersData.map((order) =>
+      // @ts-ignore
+        order.id === editingOrder.id ? { ...order, ...data } : order
+      );
+      setSalesOrdersData(updatedOrders);
+    } else {
+      const newOrder = {
+        id: salesOrdersData.length + 1,
+        orderNumber: data.soNumber,
+        customerName: data.customerName,
+        amount: '$0.00',
+        status: 'Draft',
+        createdDate: new Date().toISOString().split('T')[0],
+        shippingDate: data.dueDate,
+      };
+      setSalesOrdersData([...salesOrdersData, newOrder]);
+    }
+    setEditingOrder(null);
+  };
+
+  const handleEditSalesOrder = (order: any) => {
+    setEditingOrder(order);
+    setIsFormOpen(true);
+  };
+
+  const handleDeleteSalesOrder = (orderId: number) => {
+    const updatedOrders = salesOrdersData.filter(
+      (order) => order.id !== orderId
+    );
+    setSalesOrdersData(updatedOrders);
+    setIsDeleteConfirmation('Sales order successfully deleted.');
+    setTimeout(() => {
+      setIsDeleteConfirmation('');
+    }, 3000);
   };
 
   return (
@@ -77,7 +105,10 @@ export default function SalesOrdersPage() {
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-900">Sales Orders</h1>
         <button
-          onClick={() => setIsFormOpen(true)}
+          onClick={() => {
+            setEditingOrder(null);
+            setIsFormOpen(true);
+          }}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
         >
           <i className="fa-solid fa-plus"></i>
@@ -99,6 +130,13 @@ export default function SalesOrdersPage() {
           <option>Shipped</option>
         </select>
       </div>
+
+      {isDeleteConfirmation && (
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+          <strong className="font-bold">Success!</strong>
+          <span className="block sm:inline"> {isDeleteConfirmation}</span>
+        </div>
+      )}
 
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <table className="w-full">
@@ -127,10 +165,16 @@ export default function SalesOrdersPage() {
                 <td className="px-6 py-4 text-sm text-gray-600">{order.createdDate}</td>
                 <td className="px-6 py-4 text-sm text-gray-600">{order.shippingDate}</td>
                 <td className="px-6 py-4 text-sm">
-                  <button className="text-blue-600 hover:text-blue-800 mr-3">
+                  <button
+                    onClick={() => handleEditSalesOrder(order)}
+                    className="text-blue-600 hover:text-blue-800 mr-3"
+                  >
                     <i className="fa-solid fa-pen-to-square"></i>
                   </button>
-                  <button className="text-red-600 hover:text-red-800">
+                  <button
+                    onClick={() => handleDeleteSalesOrder(order.id)}
+                    className="text-red-600 hover:text-red-800"
+                  >
                     <i className="fa-solid fa-trash"></i>
                   </button>
                 </td>
@@ -142,8 +186,13 @@ export default function SalesOrdersPage() {
 
       <CreateSalesOrderForm
         isOpen={isFormOpen}
-        onClose={() => setIsFormOpen(false)}
+        onClose={() => {
+          setIsFormOpen(false);
+          setEditingOrder(null);
+        }}
         onSubmit={handleAddOrder}
+        // @ts-ignore
+        orderData={editingOrder}
       />
     </div>
   );

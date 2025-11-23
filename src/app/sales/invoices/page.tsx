@@ -43,6 +43,7 @@ export default function InvoicesPage() {
       paidDate: '2024-11-10',
     },
   ]);
+  const [isDeleteConfirmation, setIsDeleteConfirmation] = useState('');
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -67,6 +68,21 @@ export default function InvoicesPage() {
       paidDate: '-',
     };
     setInvoicesData([...invoicesData, newInvoice]);
+  };
+
+  const handleViewInvoice = (invoice: any) => {
+    console.log('Viewing invoice:', invoice);
+  };
+
+  const handleDeleteInvoice = (invoiceId: number) => {
+    const updatedInvoices = invoicesData.filter(
+      (invoice) => invoice.id !== invoiceId
+    );
+    setInvoicesData(updatedInvoices);
+    setIsDeleteConfirmation('Invoice successfully deleted.');
+    setTimeout(() => {
+      setIsDeleteConfirmation('');
+    }, 3000);
   };
 
   return (
@@ -97,6 +113,13 @@ export default function InvoicesPage() {
         </select>
       </div>
 
+      {isDeleteConfirmation && (
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+          <strong className="font-bold">Success!</strong>
+          <span className="block sm:inline"> {isDeleteConfirmation}</span>
+        </div>
+      )}
+
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <table className="w-full">
           <thead className="bg-gray-100 border-b border-gray-200">
@@ -124,10 +147,16 @@ export default function InvoicesPage() {
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-600">{invoice.paidDate}</td>
                 <td className="px-6 py-4 text-sm">
-                  <button className="text-blue-600 hover:text-blue-800 mr-3">
+                  <button
+                    onClick={() => handleViewInvoice(invoice)}
+                    className="text-blue-600 hover:text-blue-800 mr-3"
+                  >
                     <i className="fa-solid fa-eye"></i>
                   </button>
-                  <button className="text-red-600 hover:text-red-800">
+                  <button
+                    onClick={() => handleDeleteInvoice(invoice.id)}
+                    className="text-red-600 hover:text-red-800"
+                  >
                     <i className="fa-solid fa-trash"></i>
                   </button>
                 </td>

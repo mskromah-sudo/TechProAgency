@@ -1,14 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface CreateSalesOrderFormProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: any) => void;
+  orderData?: any;
 }
 
-export default function CreateSalesOrderForm({ isOpen, onClose, onSubmit }: CreateSalesOrderFormProps) {
+export default function CreateSalesOrderForm({
+  isOpen,
+  onClose,
+  onSubmit,
+  orderData,
+}: CreateSalesOrderFormProps) {
   const [formData, setFormData] = useState({
     soNumber: '',
     customerName: '',
@@ -16,7 +22,27 @@ export default function CreateSalesOrderForm({ isOpen, onClose, onSubmit }: Crea
     dueDate: '',
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  useEffect(() => {
+    if (orderData) {
+      setFormData({
+        ...orderData,
+        soNumber: orderData.orderNumber,
+        orderDate: orderData.createdDate,
+        dueDate: orderData.shippingDate,
+      });
+    } else {
+      setFormData({
+        soNumber: '',
+        customerName: '',
+        orderDate: '',
+        dueDate: '',
+      });
+    }
+  }, [orderData]);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -27,12 +53,6 @@ export default function CreateSalesOrderForm({ isOpen, onClose, onSubmit }: Crea
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(formData);
-    setFormData({
-      soNumber: '',
-      customerName: '',
-      orderDate: '',
-      dueDate: '',
-    });
     onClose();
   };
 
@@ -42,7 +62,9 @@ export default function CreateSalesOrderForm({ isOpen, onClose, onSubmit }: Crea
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
         <div className="flex justify-between items-center p-6 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-gray-900">Create Sales Order</h2>
+          <h2 className="text-xl font-bold text-gray-900">
+            {orderData ? 'Edit Sales Order' : 'Create Sales Order'}
+          </h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700 text-xl"
@@ -122,7 +144,7 @@ export default function CreateSalesOrderForm({ isOpen, onClose, onSubmit }: Crea
               type="submit"
               className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700"
             >
-              Create SO
+              {orderData ? 'Save Changes' : 'Create SO'}
             </button>
           </div>
         </form>
